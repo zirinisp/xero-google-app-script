@@ -71,7 +71,7 @@ function getInvoicesWithLineItems() {
     dateQuery += endDateQuery;
   }
   if (dateQuery.length > 0) {
-    //complexQuery += "&where="+dateQuery;
+    //complexQuery += "&where="+dateQuery; // ON THE FINAL VERSION THIS SHOULD BE USED, SO THE QUERIES ARE COMBINED
     complexQuery = "where="+dateQuery;
   }
   
