@@ -146,6 +146,7 @@ function getInvoices_(complexQuery){
   return invoices;
 }
 
+
 function _getInvoices_(complexQuery, pageNo) {
   
   // Get sheet
