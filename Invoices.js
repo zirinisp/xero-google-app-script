@@ -47,32 +47,34 @@ function getInvoicesWithLineItems() {
   }
   
   // Get query
-  var queryInput = sheet.getRange(2, 3, 1, 2).getValues();
-  var complexQuery = queryInput[0][0] + "=" + encodeURIComponent(queryInput[0][1]);
+  var complexQuery = {};
+  
+  // Get Status
+  var statuses = sheet.getRange("D2").getValue();  
+  if(statuses != "")
+    complexQuery["Statuses"] = statuses;
 
   // Get Start and End Dates
   var startDate = sheet.getRange(6, 3).getValue();
   var endDate = sheet.getRange(6,6).getValue();
   var dateQuery = "";
-  var startDateArray = startDate.split("/");
-  if (startDateArray.length == 3) {
-    var startDateInput = ">=DateTime("+startDateArray[2]+","+startDateArray[1]+","+startDateArray[0]+")";
-    var startDateQuery = "Date" + encodeURIComponent(startDateInput);
+  if (startDate) {
+    
+    var startDateInput = ">="+convertDateToXero(startDate);
+    var startDateQuery = "Date" + startDateInput;
     dateQuery = startDateQuery;
   }
-  var endDateQuery = "";
-  var endDateArray = endDate.split("/");
-  if (endDateArray.length == 3) {
-    var endDateInput = "<=DateTime("+endDateArray[2]+","+endDateArray[1]+","+endDateArray[0]+")";
-    endDateQuery = "Date" + encodeURIComponent(endDateInput);
+
+  if (endDate) {
+    var endDateInput = "<="+convertDateToXero(endDate);
+    endDateQuery = "Date" + endDateInput;
     if (dateQuery.length > 0) {
-      dateQuery += encodeURIComponent("&&");
+      dateQuery += "&&";
     }
     dateQuery += endDateQuery;
   }
   if (dateQuery.length > 0) {
-    //complexQuery += "&where="+dateQuery; // ON THE FINAL VERSION THIS SHOULD BE USED, SO THE QUERIES ARE COMBINED
-    complexQuery = "where="+dateQuery;
+    complexQuery["where"] = dateQuery;
   }
   
   // Get account code filter
@@ -89,15 +91,17 @@ function getInvoicesWithLineItems() {
     pageNo = 1;
   }
   
+  complexQuery["page"] = pageNo;
   // Get invoices
-  var invoices = getInvoices_(complexQuery, pageNo);
+  var invoices = getInvoices_(complexQuery);
   
   if (invoices.length > 0) {
     // Get line items
     var lineItems = getLineItems_(invoices, filter);
     
     // Paste values
-    sheet.getRange(sheet.getLastRow() + 1, 1, lineItems.length, lineItems[0].length).setValues(lineItems);
+    if(lineItems.length > 0)
+      sheet.getRange(sheet.getLastRow() + 1, 1, lineItems.length, lineItems[0].length).setValues(lineItems);
     
     // Paste date of latest query
     sheet.getRange(6, 9).setValue(Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyy-MM-dd"));
@@ -110,7 +114,39 @@ function getInvoicesWithLineItems() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function getInvoices_(complexQuery, pageNo) {
+function getInvoices_(complexQuery){
+  var pageNo = complexQuery["page"],
+      invoices = [];
+  // Get sheet
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheets = ss.getSheets();
+  for (var i = 0 ; i < sheets.length; i++) {
+    if (sheets[i].getSheetId() == sheetID) {
+      var sheet = sheets[i];
+      break;
+    }
+  }
+  
+  var currentPageCell = sheet.getRange(3, 9);
+  
+  var moreFlag = true;
+  var uptoPage = parseInt(pageNo) + batchSize; // But not including
+  
+  while (moreFlag && pageNo < uptoPage ) {
+    var invoicesPage = getXeroInvoices(complexQuery)
+    if (invoicesPage.length > 0 ) {
+      invoices = invoices.concat(invoicesPage);
+      currentPageCell.setValue(pageNo);
+      SpreadsheetApp.flush();
+    } else { // No more data
+      moreFlag = false;
+    }
+    complexQuery["page"] = ++pageNo; // next page  
+  }
+  return invoices;
+}
+
+function _getInvoices_(complexQuery, pageNo) {
   
   // Get sheet
   var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -292,4 +328,10 @@ function getLineItems_(invoices, filter) {
     }
   }
   return output;
+}
+
+// Convert Date to Xero-DateTime
+function convertDateToXero(date) {
+  var xeroDate = "DateTime("+date.getYear()+","+(date.getMonth()+1)+","+date.getDate()+")";
+  return xeroDate;
 }
