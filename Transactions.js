@@ -2,22 +2,23 @@
 
 var batchSize = 200; // Get these many pages and then stop
 
-var sheetInvoices2018 = '2018-Inv';
-var sheetInvoices2019 = '2019-Inv';
-var sheetInvoices2020 = '2020-Inv';
+var sheetTransactions2018 = '2018-Trans';
+var sheetTransactions2019 = '2019-Trans';
+var sheetTransactions2020 = '2020-Trans';
 
 //-------------------------------------------------------
 
-function xeroInvoiceReset() {
-  clearInvoiceLineItems(sheetInvoices2018);
-  getInvoicesWithLineItems(sheetInvoices2018);
-  clearInvoiceLineItems(sheetInvoices2019);
-  getInvoicesWithLineItems(sheetInvoices2019);
-  clearInvoiceLineItems(sheetInvoices2020);
-  getInvoicesWithLineItems(sheetInvoices2020);
+
+function xeroTransactionsReset() {
+  clearTransactionLineItems(sheetTransactions2018);
+  getTransactionsWithLineItems(sheetTransactions2018);
+  clearTransactionLineItems(sheetTransactions2019);
+  getTransactionsWithLineItems(sheetTransactions2019);
+  clearTransactionLineItems(sheetTransactions2020);
+  getTransactionsWithLineItems(sheetTransactions2020);
 }
 
-function clearInvoiceLineItems(sheetName) {
+function clearTransactionLineItems(sheetName) {
   
   // Get sheet
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
@@ -34,8 +35,7 @@ function clearInvoiceLineItems(sheetName) {
   sheet.getRange(6, 9).clearContent();
 }
 
-
-function getInvoicesWithLineItems(sheetName) {
+function getTransactionsWithLineItems(sheetName) {
   
   // Get sheet
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
@@ -87,11 +87,11 @@ function getInvoicesWithLineItems(sheetName) {
   
   complexQuery["page"] = pageNo;
   // Get invoices
-  var invoices = getInvoices_(sheetName, complexQuery);
+  var invoices = getTransactions_(sheetName, complexQuery);
   
   if (invoices.length > 0) {
     // Get line items
-    var lineItems = getLineItems_(sheetName, invoices, filter);
+    var lineItems = getTransactionLineItems_(sheetName, invoices, filter);
     
     // Paste values
     if(lineItems.length > 0)
@@ -108,7 +108,7 @@ function getInvoicesWithLineItems(sheetName) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function getInvoices_(sheetName, complexQuery){
+function getTransactions_(sheetName, complexQuery){
   var pageNo = complexQuery["page"],
       invoices = [];
   // Get sheet
@@ -120,7 +120,7 @@ function getInvoices_(sheetName, complexQuery){
   var uptoPage = parseInt(pageNo) + batchSize; // But not including
   
   while (moreFlag && pageNo < uptoPage ) {
-    var invoicesPage = getXeroInvoices(complexQuery)
+    var invoicesPage = getXeroTransactions(complexQuery)
     if (invoicesPage.length > 0 ) {
       invoices = invoices.concat(invoicesPage);
       currentPageCell.setValue(pageNo);
@@ -134,73 +134,11 @@ function getInvoices_(sheetName, complexQuery){
 }
 
 
-function _getInvoices_(sheetName, complexQuery, pageNo) { // OLD FUNCTION
-  
-  // Get sheet
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
-  
-  var currentPageCell = sheet.getRange(3, 9);
-  
-  // Initialise
-  var moreFlag = true;
-  var uptoPage = parseInt(pageNo) + batchSize; // But not including
-  var output = [];
-  var method = 'GET';
-  var requestURL = API_END_POINT + INVOICES_END_POINT ;
-  var oauth_signature_method = 'RSA-SHA1';
-  var oauth_version = '1.0';    
-  var rsa = new RSAKey();
-  rsa.readPrivateKeyFromPEMString(PEM_KEY);
-  var hashAlg = "sha1";
-  
-  var invoices = [];
-  
-  while (moreFlag && pageNo < uptoPage ) {
-    var oauth_nonce = createGuid();
-    var oauth_timestamp = (new Date().getTime()/1000).toFixed();
-    var signBase = 'GET' + '&' + encodeURIComponent(requestURL) + '&' +
-      encodeURIComponent( complexQuery + '&oauth_consumer_key=' + CONSUMER_KEY + '&oauth_nonce=' + 
-                         oauth_nonce + '&oauth_signature_method=' + oauth_signature_method + '&oauth_timestamp=' +
-                         oauth_timestamp + '&oauth_token=' + CONSUMER_KEY + '&oauth_version=' + oauth_version + '&page=' + pageNo);
-    
-    var hSig = rsa.signString(signBase, hashAlg);
-    
-    var oauth_signature = encodeURIComponent(hextob64(hSig));  
-    var authHeader = "OAuth oauth_token=\"" + CONSUMER_KEY + "\",oauth_nonce=\"" + oauth_nonce + 
-      "\",oauth_consumer_key=\"" + CONSUMER_KEY + "\",oauth_signature_method=\"RSA-SHA1\",oauth_timestamp=\"" +
-        oauth_timestamp + "\",oauth_version=\"1.0\",oauth_signature=\"" + oauth_signature + "\"";
-    
-    var dateDisplayValue = sheet.getRange(6, 9).getDisplayValue();
-    if (dateDisplayValue === "") {
-      dateDisplayValue = "1990-01-01";
-    }
-    var utcDate = new Date(dateDisplayValue);
-    utcDate = utcDate.toUTCString();
-    
-    var headers = { "Authorization": authHeader, "Accept": "application/json", "If-Modified-Since": utcDate};
-    var options = { 'muteHttpExceptions': true, "headers": headers}; 
-    var url = requestURL + '?' + complexQuery + '&page=' + pageNo;
-    var response = UrlFetchApp.fetch(url, options);
-    var json = response.getContentText();
-    var data2 = JSON.parse(json);
-    var invoicesPage = data2.Invoices;
-    if (invoicesPage.length > 0 ) {
-      invoices = invoices.concat(invoicesPage);
-      currentPageCell.setValue(pageNo);
-      SpreadsheetApp.flush();
-    } else { // No more data
-      moreFlag = false;
-    }
-    pageNo++; // next page  
-  }
-  
-  return invoices;
-}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function getLineItems_(sheetName, invoices, filter) {
+function getTransactionLineItems_(sheetName, invoices, filter) {
   
   // Get sheet
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
@@ -235,12 +173,12 @@ function getLineItems_(sheetName, invoices, filter) {
   var invoice, key, val;
   var lineItems, lineItem, lineKey, lineVal, acCode, itemDate, lItemID, flag, currencyRate, taxInclusive;
   
-  var keys = ['InvoiceID', 'InvoiceNumber', 'BankAccount.Name', 'DateString', 'Type', 'Contact.Name', 'Status', 'Total', 'LineAmountTypes', 'CurrencyCode', 'CurrencyRate'];
+  var keys = ['BankTransactionID', 'Reference', 'BankAccount.Name', 'DateString', 'Type', 'Contact.Name', 'Status', 'Total', 'LineAmountTypes', 'CurrencyCode', 'CurrencyRate'];
   var lineKeys = ['LineItemID', 'AccountCode', 'Description', 'Quantity', 'LineAmount', 'TaxAmount'];
-
   var output = [];
   
   for (var i = 0; i < invoices.length; i++) {
+
     invoice = invoices[i];
     lineItems = invoice.LineItems;
     
@@ -279,7 +217,7 @@ function getLineItems_(sheetName, invoices, filter) {
       }
       taxInclusive = (invoice.LineAmountTypes != 'Exclusive');
       
-      for (var li = 0; li < lineItems.length; li++) {
+      for (var li = 0; li < lineItems.length; li++) { 
         var lineData = [];
         lineItem = lineItems[li];
         //if (lineItem.Tracking[0].Option == tCat || tCat === '') {
@@ -314,8 +252,11 @@ function getLineItems_(sheetName, invoices, filter) {
             if (currencyRate != 1.0) {
               gbpAmount = gbpAmount / currencyRate;
             }
+            // This is only for transactions not invoices
+            if (invoice.Type.indexOf("RECEIVE") !== -1) {
+              gbpAmount = -gbpAmount;
+            }
             lineData.push(gbpAmount);
-
             lineData = invoiceData.concat(lineData);
             
             if (flag) {
