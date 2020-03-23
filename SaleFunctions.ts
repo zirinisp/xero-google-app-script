@@ -1,12 +1,6 @@
 
-import "./table.js";
-import "./item.js";
-import "./selector.js";
-
-
-
 var AllAccountingDataTable = 'All Accounting Data';
-var SalesDataTable = 'Day Sales';//'All Accounting Data';
+var SalesDataTable = 'Day Sales';
 
 
 namespace Accounting {
@@ -40,6 +34,8 @@ namespace Accounting {
         Deliveroo = 'DELR',
         MealPal = 'MPAL',
         Seamless = 'SEAML',
+        Cash = 'UND',
+        iZettle = 'IZET',
         Other = ''
     }
 
@@ -79,6 +75,30 @@ namespace Accounting {
 
         isDeliveroo(): Boolean {
             if (this.account.toString() === AccountEnum.Deliveroo) {
+                return true;
+            }
+            return false;
+        }
+        isCash(): Boolean {
+            if (this.account.toString() === AccountEnum.Cash) {
+                return true;
+            }
+            return false;
+        }
+        isCard(): Boolean {
+            if (this.account.toString() === AccountEnum.iZettle) {
+                return true;
+            }
+            return false;
+        }
+        isSeamless(): Boolean {
+            if (this.account.toString() === AccountEnum.Seamless) {
+                return true;
+            }
+            return false;
+        }
+        isMealPal(): Boolean {
+            if (this.account.toString() === AccountEnum.MealPal) {
                 return true;
             }
             return false;
@@ -186,6 +206,11 @@ namespace Accounting {
                 'kitchen': this.totalKitchenSales(),
                 'grill': this.totalGrillSales(),
                 'service': this.totalServiceSales(),
+                'cash': this.totalCashTurnover(),
+                'card': this.totalCardTurnover(),
+                'seamless': this.totalSeamlessTurnover(),
+                'mealpal': this.totalMealPalTurnover(),
+                'total tax': this.totalSalesTax(),
                 'total': this.totalSales()
             }
             return item;
@@ -210,6 +235,16 @@ namespace Accounting {
             this.entries.forEach(element => {
                 if (element.status.active() && element.account.isSales()) {
                     total += element.amount;
+                }
+            })
+            return total;
+        }
+
+        totalSalesTax() {
+            var total = 0.0;
+            this.entries.forEach(element => {
+                if (element.status.active() && element.account.isSales()) {
+                    total += element.taxAmount;
                 }
             })
             return total;
@@ -256,7 +291,7 @@ namespace Accounting {
         totalDeliverySales() {
             var total = 0.0;
             this.entries.forEach(element => {
-                if (element.status.active() && element.account.isDelivery()) {
+                if (element.status.active() && element.account.isDelivery() && element.isPosSale()) {
                     total += element.amount;
                 }
             })
@@ -265,7 +300,7 @@ namespace Accounting {
         totalDeliverooTurnover() {
             var total = 0.0;
             this.entries.forEach(element => {
-                if (element.status.active() && element.account.isDeliveroo()) {
+                if (element.status.active() && element.account.isDeliveroo() && element.isPosSale()) {
                     total += element.amount;
                 }
             })
@@ -274,18 +309,59 @@ namespace Accounting {
         totalUberTurnover() {
             var total = 0.0;
             this.entries.forEach(element => {
-                if (element.status.active() && element.account.isUber()) {
+                if (element.status.active() && element.account.isUber() && element.isPosSale()) {
                     total += element.amount;
                 }
             })
             return total;
         }
 
-        public static fromAccountDataTable(table: Table): Sales {
+        totalCashTurnover() {
+            var total = 0.0;
+            this.entries.forEach(element => {
+                if (element.status.active() && element.account.isCash() && element.isPosSale()) {
+                    total += element.amount;
+                }
+            })
+            return total;
+        }
+        totalCardTurnover() {
+            var total = 0.0;
+            this.entries.forEach(element => {
+                if (element.status.active() && element.account.isCard() && element.isPosSale()) {
+                    total += element.amount;
+                }
+            })
+            return total;
+        }
+
+        totalSeamlessTurnover() {
+            var total = 0.0;
+            this.entries.forEach(element => {
+                if (element.status.active() && element.account.isSeamless() && element.isPosSale()) {
+                    total += element.amount;
+                }
+            })
+            return total;
+        }
+        totalMealPalTurnover() {
+            var total = 0.0;
+            this.entries.forEach(element => {
+                if (element.status.active() && element.account.isMealPal() && element.isPosSale()) {
+                    total += element.amount;
+                }
+            })
+            return total;
+        }
+
+        public static fromAccountDataTable(data: SheetHeadedData): Sales {
             var entries: Entry[] = [];
-            table.items.forEach(element => {
-                var entry = Entry.fromItem(element);
-                entries.push(entry);
+            data.getValues();
+            data.values.forEach(element => {
+                var entry = Entry.fromXeroItem(element);
+                if (entry.date) { // Check and remove empty entries
+                    entries.push(entry);
+                }
             });
             return new Sales(entries);
         }
@@ -296,11 +372,13 @@ namespace Accounting {
         constructor(sales: Sales) {
             var dateDictionary: { [id: string]: Sales } = {};
             sales.entries.forEach(element => {
-                var key = dayString(element.date);
-                if (!dateDictionary[key]) {
-                    dateDictionary[key] = new Sales([]);
+                if (element.date) {
+                    var key = dayString(element.date);
+                    if (!dateDictionary[key]) {
+                        dateDictionary[key] = new Sales([]);
+                    }
+                    dateDictionary[key].add(element);    
                 }
-                dateDictionary[key].add(element);
             });
             this.days = dateDictionary;
         }
@@ -332,8 +410,10 @@ namespace Accounting {
     export class Entry {
         lineItemId: string;
         date: Date;
+        contactName: string;
         status: Status;
         amount: number;
+        taxAmount: number;
         category: TrackingCategory;
         account: Account;
 
@@ -341,15 +421,19 @@ namespace Accounting {
         constructor(
             lineItemId: string,
             date: Date,
+            contactName: string,
             status: Status,
             amount: number,
+            taxAmount: number,
             category: TrackingCategory,
             account: Account) {
 
             this.lineItemId = lineItemId;
             this.date = date;
+            this.contactName = contactName;
             this.status = status;
             this.amount = amount;
+            this.taxAmount = taxAmount;
             this.category = category;
             this.account = account;
         }
@@ -359,8 +443,10 @@ namespace Accounting {
             {
                 'id': this.lineItemId,
                 'date': this.date,
+                'contactName': this.contactName,
                 'status': this.status.status,
                 'amount': this.amount,
+                'tax amount': this.taxAmount,
                 'category': this.category.category,
                 'account': this.account.account,
                 'kitchen': this.category.isKitchen(),
@@ -371,63 +457,57 @@ namespace Accounting {
             return item;
         }
 
-        public static fromItem(item: Item): Entry {
-            var id: string = item.getFieldValue('Line Item ID');
-            var statusString: string = item.getFieldValue('Status');
+        isPosSale() : Boolean {
+            return (this.contactName === 'POS Sales' || this.contactName === 'Delivery Sales');
+        }
+
+        public static fromXeroItem(item: { [id: string]: any }): Entry {
+            var id: string = item['Line Item ID'];
+            var statusString: string = item['Status'];
             var status = new Status(statusString);
-            var accountString: string = item.getFieldValue('Account');
+            var accountString: string = item['Account'];
+            var contactName: string = item['Contact Name'];
             var account = new Account(accountString);
-            var date: Date = item.getFieldValue('Date');
-            var amount: number = item.getFieldValue('GBP Amount - No Tax');
-            var categoryString: string = item.getFieldValue('Tracking Category');
+            var date: Date = item['Date'];
+            var amount: number = item['GBP Amount - No Tax'];
+            var taxAmount: number = item['Tax Amount'];  // TODO: Should be changed to GBP Tax amount when ready
+            var categoryString: string = item['Tracking Category'];
             var category = new TrackingCategory(categoryString);
-            return new Entry(id, date, status, amount, category, account);
+            return new Entry(id, date, contactName, status, amount, taxAmount, category, account);
         }
     }
 }
 
-function updateSales() {
-    var dataTable = getTable(AllAccountingDataTable, 9, 'Line Item ID');
-    var sales = Accounting.Sales.fromAccountDataTable(dataTable);
-    var dailySales = new Accounting.DaySales(sales);
-    var exportTable = getTable(SalesDataTable, 1, 'id');
-    exportTable.deleteAll();
-    var sortedDays = Object.keys(dailySales.days).sort().reverse();
-    sortedDays.forEach(key => {
-        var daySales = dailySales.days[key];
-        daySales.entries.forEach(element => {
-            exportTable.add(element.toItem());
-        })
-    });
-    exportTable.commit();
-}
-
 function updateDayTotalsTable() {
     SpreadsheetApp.getActive().toast("1. Getting Accounting Data");
-    var dataTable = getTable(AllAccountingDataTable, 9, 'Line Item ID');
+    var dataTable = new SheetHeadedData(AllAccountingDataTable, new SSHeadedRange(0,0,0,0,9,10));
     SpreadsheetApp.getActive().toast("2. Processing Accounting Data");
     var sales = Accounting.Sales.fromAccountDataTable(dataTable);
     SpreadsheetApp.getActive().toast("3. Dividing to Dates");
     var dailySales = new Accounting.DaySales(sales);
-    var exportTable = getTable('Test Export 2', 1, 'id');
+    var exportTable = new SheetHeadedData(SalesDataTable, new SSHeadedRange(0,0,0,0,1,2));
     SpreadsheetApp.getActive().toast("4. Clearing Table");
-    exportTable.deleteAll();
+    exportTable.clearValues();
     var sortedDays = Object.keys(dailySales.days).sort().reverse();
     var i = 0;
     SpreadsheetApp.getActive().toast("5. Preparing Results "+i+"/"+sortedDays.length);
+    var data: [{ [id: string]: any }] = [{}];
+    data.pop();
+
     sortedDays.forEach(key => {
         var daySales = dailySales.days[key];
         var item = daySales.totalSalesDictionary();
         item["id"] =  key;
         item["date"] = Accounting.dayStringToDate(key);
-        exportTable.add(item);
+        data.push(item);
         i++;
         if (i%15 == 0) {
             SpreadsheetApp.getActive().toast("5. Preparing Results "+i+"/"+sortedDays.length);
         }
     })
     SpreadsheetApp.getActive().toast("6. Displaying Data");
-    exportTable.commit();
+    exportTable.values = data;
+    exportTable.writeValues();
     SpreadsheetApp.getActive().toast("7. Complete");
 }
 
@@ -435,7 +515,7 @@ function updateDayTotals(from: Date, to: Date, headerString: string): any[][]{
     var headers = headerString.toString().split(',');
     var data = [];
 
-    var dataTable = getTable(AllAccountingDataTable, 9, 'Line Item ID');
+    var dataTable = new SheetHeadedData(AllAccountingDataTable, new SSHeadedRange(0,0,0,0,9,10));
     var sales = Accounting.Sales.fromAccountDataTable(dataTable);
     sales = sales.salesForPeriod(from, to);
     var dailySales = new Accounting.DaySales(sales);

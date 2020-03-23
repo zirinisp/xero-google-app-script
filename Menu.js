@@ -20,7 +20,7 @@ function xeroReset() {
   xeroInvoiceReset();
   xeroTransactionsReset();
   sleep(15000);
-  updateSales();
+  updateDayTotalsTable();
 }
 ///////////////////////////////////////////////////////////////////
 function log(p){return(Logger.log(p))}
