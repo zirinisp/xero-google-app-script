@@ -10,7 +10,7 @@ function onOpen() {
   .addItem('Xero Transacrion Reset Current', 'updateTransactionData')  
   .addItem('Xero Transaction Reset', 'xeroTransactionsReset')  
   .addSeparator()
-  .addItem('Update Day Totals', 'updateDayTotals')  
+  .addItem('Update Day Totals', 'updateDayTotalsTable')  
   .addSeparator()
   .addItem('Xero Reset', 'xeroReset')  
   .addToUi();

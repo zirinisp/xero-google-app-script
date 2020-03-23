@@ -15,8 +15,6 @@ function xeroInvoiceReset() {
   getInvoicesWithLineItems(sheetInvoices2019);
   clearInvoiceLineItems(sheetInvoices2020);
   getInvoicesWithLineItems(sheetInvoices2020);
-  sleep(15000);
-  updateSales();
 }
 
 function clearInvoiceLineItems(sheetName) {

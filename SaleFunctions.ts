@@ -6,7 +6,7 @@ import "./selector.js";
 
 
 var AllAccountingDataTable = 'All Accounting Data';
-var SalesDataTable = 'Test Export';//'All Accounting Data';
+var SalesDataTable = 'Day Sales';//'All Accounting Data';
 
 
 namespace Accounting {
@@ -164,6 +164,31 @@ namespace Accounting {
         entries: Entry[];
         constructor(entries: Entry[]) {
             this.entries = entries;
+        }
+
+        salesForPeriod(from: Date, to: Date): Sales {
+            var newEntries: Entry[] = [];
+            this.entries.forEach(element => {
+                if (element.date >= from, element.date <= to) {
+                    newEntries.push(element);
+                }
+            });
+            return new Sales(newEntries);
+        }
+
+        totalSalesDictionary(): {[id: string] : any} {
+            var item =
+            {
+                'restaurant': this.totalRestaurantSales(),
+                'delivery': this.totalDeliverySales(),
+                'deliveroo': this.totalDeliverooTurnover(),
+                'uber': this.totalUberTurnover(),
+                'kitchen': this.totalKitchenSales(),
+                'grill': this.totalGrillSales(),
+                'service': this.totalServiceSales(),
+                'total': this.totalSales()
+            }
+            return item;
         }
 
         add(entry: Entry) {
@@ -377,7 +402,7 @@ function updateSales() {
     exportTable.commit();
 }
 
-function updateDayTotals() {
+function updateDayTotalsTable() {
     SpreadsheetApp.getActive().toast("1. Getting Accounting Data");
     var dataTable = getTable(AllAccountingDataTable, 9, 'Line Item ID');
     SpreadsheetApp.getActive().toast("2. Processing Accounting Data");
@@ -392,19 +417,9 @@ function updateDayTotals() {
     SpreadsheetApp.getActive().toast("5. Preparing Results "+i+"/"+sortedDays.length);
     sortedDays.forEach(key => {
         var daySales = dailySales.days[key];
-        var item =
-        {
-            'id': key,
-            'date': Accounting.dayStringToDate(key),
-            'restaurant': daySales.totalRestaurantSales(),
-            'delivery': daySales.totalDeliverySales(),
-            'deliveroo': daySales.totalDeliverooTurnover(),
-            'uber': daySales.totalUberTurnover(),
-            'kitchen': daySales.totalKitchenSales(),
-            'grill': daySales.totalGrillSales(),
-            'service': daySales.totalServiceSales(),
-            'total': daySales.totalSales()
-        }
+        var item = daySales.totalSalesDictionary();
+        item["id"] =  key;
+        item["date"] = Accounting.dayStringToDate(key);
         exportTable.add(item);
         i++;
         if (i%15 == 0) {
@@ -414,6 +429,29 @@ function updateDayTotals() {
     SpreadsheetApp.getActive().toast("6. Displaying Data");
     exportTable.commit();
     SpreadsheetApp.getActive().toast("7. Complete");
+}
+
+function updateDayTotals(from: Date, to: Date, headerString: string): any[][]{
+    var headers = headerString.toString().split(',');
+    var data = [];
+
+    var dataTable = getTable(AllAccountingDataTable, 9, 'Line Item ID');
+    var sales = Accounting.Sales.fromAccountDataTable(dataTable);
+    sales = sales.salesForPeriod(from, to);
+    var dailySales = new Accounting.DaySales(sales);
+    var sortedDays = Object.keys(dailySales.days).sort().reverse();
+    sortedDays.forEach(key => {
+        var daySales = dailySales.days[key];
+        var item = daySales.totalSalesDictionary();
+        item["id"] =  key;
+        item["date"] = Accounting.dayStringToDate(key);
+        var values = [];
+        headers.forEach(key => {
+            values.push(item[key] || "");
+        });
+        data.push(values);
+    })
+    return data;
 }
 
 function sameDay(day1: Date, day2: Date): Boolean {
