@@ -206,9 +206,10 @@ namespace Accounting {
         constructor(type: string) {
             this.type = type;
         }
-
+        // The following is not correct we need to find account information to get these data.
         isExpense(): Boolean {
             if (
+                (this.type.toString() === EntryTypeEnum.ACCREC) ||
                 (this.type.toString() === EntryTypeEnum.ACCPAY) ||
                 (this.type.toString() === EntryTypeEnum.SPEND)) {
 
@@ -216,6 +217,22 @@ namespace Accounting {
             }
             return false;
         }
+
+/* Not finished
+        isPrepayment() : Boolean {
+            if (
+                (this.type.toString() === EntryTypeEnum.SPEND_PREPAYMENT) ||
+                (this.type.toString() === EntryTypeEnum.RECEIVE_PREPAYMENT) ||
+                (this.type.toString() === EntryTypeEnum.SPEND_OVERPAYMENT) ||
+                (this.type.toString() === EntryTypeEnum.RECEIVE_OVERPAYMENT) ||
+                (this.type.toString() === EntryTypeEnum.RECEIVE_TRANSFER) ||
+                (this.type.toString() === EntryTypeEnum.SPEND_TRANSFER)) {
+
+                return true;
+            }
+            return false;
+
+        }*/
     }
 
     export class Sales {
@@ -251,7 +268,8 @@ namespace Accounting {
                 'total tax': this.totalSalesTax(),
                 'total': this.totalSales(),
                 'food cost' : this.totalFoodCost(),
-                'total cost' : this.totalCosts()
+                'total cost' : this.totalCosts(),
+
             }
             return item;
         }
@@ -413,7 +431,6 @@ namespace Accounting {
             })
             return total;
         }
-
 
         public static fromAccountDataTable(data: SheetHeadedData): Sales {
             var entries: Entry[] = [];
