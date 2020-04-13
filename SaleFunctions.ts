@@ -36,6 +36,7 @@ namespace Accounting {
         Seamless = 'SEAML',
         Cash = 'UND',
         iZettle = 'IZET',
+        FoodCost = '310',
         Other = ''
     }
 
@@ -99,6 +100,12 @@ namespace Accounting {
         }
         isMealPal(): Boolean {
             if (this.account.toString() === AccountEnum.MealPal) {
+                return true;
+            }
+            return false;
+        }
+        isFoodCost(): Boolean {
+            if (this.account.toString() === AccountEnum.FoodCost) {
                 return true;
             }
             return false;
@@ -211,7 +218,8 @@ namespace Accounting {
                 'seamless': this.totalSeamlessTurnover(),
                 'mealpal': this.totalMealPalTurnover(),
                 'total tax': this.totalSalesTax(),
-                'total': this.totalSales()
+                'total': this.totalSales(),
+                'food cost' : this.totalFoodCost()
             }
             return item;
         }
@@ -354,6 +362,17 @@ namespace Accounting {
             return total;
         }
 
+        totalFoodCost() {
+            var total = 0.0;
+            this.entries.forEach(element => {
+                if (element.status.active() && element.account.isFoodCost()) {
+                    total += element.amount;
+                }
+            })
+            return total;
+        }
+
+
         public static fromAccountDataTable(data: SheetHeadedData): Sales {
             var entries: Entry[] = [];
             data.getValues();
@@ -459,6 +478,10 @@ namespace Accounting {
 
         isPosSale() : Boolean {
             return (this.contactName === 'POS Sales' || this.contactName === 'Delivery Sales');
+        }
+
+        isFoodCost() : Boolean {
+            return this.account.isFoodCost();
         }
 
         public static fromXeroItem(item: { [id: string]: any }): Entry {
