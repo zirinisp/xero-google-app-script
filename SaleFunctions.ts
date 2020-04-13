@@ -187,6 +187,36 @@ namespace Accounting {
 
     }
 
+    enum EntryTypeEnum {
+        ACCPAY = 'ACCPAY',
+        ACCREC = 'ACCREC',
+        RECEIVE_TRANSFER = 'RECEIVE-TRANSFER',
+        SPEND_TRANSFER = 'SPEND-TRANSFER',
+        RECEIVE = 'RECEIVE',
+        SPEND = 'SPEND',
+        SPEND_PREPAYMENT = 'SPEND-PREPAYMENT',
+        RECEIVE_PREPAYMENT = 'RECEIVE-PREPAYMENT',
+        SPEND_OVERPAYMENT = 'SPEND-OVERPAYMENT',
+        RECEIVE_OVERPAYMENT = 'RECEIVE-OVERPAYMENT'
+    }
+
+    class EntryType {
+        type: string;
+        constructor(type: string) {
+            this.type = type;
+        }
+
+        isExpense(): Boolean {
+            if (
+                (this.type.toString() === EntryTypeEnum.ACCPAY) ||
+                (this.type.toString() === EntryTypeEnum.SPEND)) {
+
+                return true;
+            }
+            return false;
+        }
+    }
+
     export class Sales {
         entries: Entry[];
         constructor(entries: Entry[]) {
@@ -219,7 +249,8 @@ namespace Accounting {
                 'mealpal': this.totalMealPalTurnover(),
                 'total tax': this.totalSalesTax(),
                 'total': this.totalSales(),
-                'food cost' : this.totalFoodCost()
+                'food cost' : this.totalFoodCost(),
+                'other cost' : this.otherCosts()
             }
             return item;
         }
@@ -372,6 +403,16 @@ namespace Accounting {
             return total;
         }
 
+        otherCosts() {
+            var total = 0.0;
+            this.entries.forEach(element => {
+                if (element.status.active() && !element.account.isFoodCost() && (element.type.isExpense())) {
+                    total += element.amount;
+                }
+            })
+            return total;
+        }
+
 
         public static fromAccountDataTable(data: SheetHeadedData): Sales {
             var entries: Entry[] = [];
@@ -435,6 +476,7 @@ namespace Accounting {
         taxAmount: number;
         category: TrackingCategory;
         account: Account;
+        type: EntryType;
 
 
         constructor(
@@ -445,7 +487,9 @@ namespace Accounting {
             amount: number,
             taxAmount: number,
             category: TrackingCategory,
-            account: Account) {
+            account: Account,
+            type: EntryType
+            ) {
 
             this.lineItemId = lineItemId;
             this.date = date;
@@ -455,6 +499,7 @@ namespace Accounting {
             this.taxAmount = taxAmount;
             this.category = category;
             this.account = account;
+            this.type = type;
         }
 
         toItem(): { [id: string]: any } {
@@ -467,6 +512,7 @@ namespace Accounting {
                 'amount': this.amount,
                 'tax amount': this.taxAmount,
                 'category': this.category.category,
+                'type': this.type.type,
                 'account': this.account.account,
                 'kitchen': this.category.isKitchen(),
                 'sales': this.account.isSales(),
@@ -484,6 +530,13 @@ namespace Accounting {
             return this.account.isFoodCost();
         }
 
+        isExpense(): Boolean {
+            if (this.isFoodCost) {
+                return false;
+            }
+            return this.type.isExpense();
+        }
+
         public static fromXeroItem(item: { [id: string]: any }): Entry {
             var id: string = item['Line Item ID'];
             var statusString: string = item['Status'];
@@ -496,7 +549,9 @@ namespace Accounting {
             var taxAmount: number = item['Tax Amount'];  // TODO: Should be changed to GBP Tax amount when ready
             var categoryString: string = item['Tracking Category'];
             var category = new TrackingCategory(categoryString);
-            return new Entry(id, date, contactName, status, amount, taxAmount, category, account);
+            var typeString: string = item['Type'];
+            var type = new EntryType(typeString);
+            return new Entry(id, date, contactName, status, amount, taxAmount, category, account, type);
         }
     }
 }
