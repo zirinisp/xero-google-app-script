@@ -37,6 +37,7 @@ namespace Accounting {
         Cash = 'UND',
         iZettle = 'IZET',
         FoodCost = '310',
+        Contructors = '481',
         Other = ''
     }
 
@@ -250,7 +251,7 @@ namespace Accounting {
                 'total tax': this.totalSalesTax(),
                 'total': this.totalSales(),
                 'food cost' : this.totalFoodCost(),
-                'other cost' : this.otherCosts()
+                'total cost' : this.totalCosts()
             }
             return item;
         }
@@ -403,10 +404,10 @@ namespace Accounting {
             return total;
         }
 
-        otherCosts() {
+        totalCosts() {
             var total = 0.0;
             this.entries.forEach(element => {
-                if (element.status.active() && !element.account.isFoodCost() && (element.type.isExpense())) {
+                if (element.status.active() && (element.type.isExpense())) {
                     total += element.amount;
                 }
             })
