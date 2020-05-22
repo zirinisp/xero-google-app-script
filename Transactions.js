@@ -245,18 +245,29 @@ function getTransactionLineItems_(sheetName, invoices, filter) {
             } else {
               lineData.push('');            
             }
-            var gbpAmount = lineItem.LineAmount;
-            if ((lineItem.TaxAmount != 0.0) && (taxInclusive)) {
-              gbpAmount -= lineItem.TaxAmount;
+            var gbpAmountNoTax = lineItem.LineAmount;
+            var gbpTax = lineItem.TaxAmount;
+            var gbpAmountWithTax = lineItem.LineAmount;
+            if (lineItem.TaxAmount != 0.0) {
+              if (taxInclusive) {
+                gbpAmountNoTax -= lineItem.TaxAmount;
+              } else {
+                gbpAmountWithTax += lineItem.TaxAmount;
+              }
             }
             if (currencyRate != 1.0) {
-              gbpAmount = gbpAmount / currencyRate;
+              gbpAmountNoTax = gbpAmountNoTax / currencyRate;
+              gbpTax = gbpTax / currencyRate;
+              gbpAmountWithTax = gbpAmountWithTax / currencyRate;
             }
             // This is only for transactions not invoices
             if (invoice.Type.indexOf("RECEIVE") !== -1) {
-              gbpAmount = -gbpAmount;
+              gbpAmountNoTax = -gbpAmountNoTax;
+              gbpAmountWithTax = -gbpAmountWithTax;
             }
-            lineData.push(gbpAmount);
+            lineData.push(gbpAmountNoTax);
+            lineData.push(gbpTax);
+            lineData.push(gbpAmountWithTax);
             lineData = invoiceData.concat(lineData);
             
             if (flag) {

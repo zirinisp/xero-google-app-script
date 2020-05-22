@@ -203,6 +203,16 @@ class SheetHeadedData {
         this.writeDataRange().setValues(data);
     }
 
+    appendValues(newValues: [{ [index: string]: any }]) {
+        this.getValues();
+        var lastRow = this.sheet.getLastRow() - 1;
+        var row = lastRow;
+        newValues.forEach(element => {
+            this.values[row] = element;
+            row++;
+        });
+    }
+
 }
 
 class SSRange {
