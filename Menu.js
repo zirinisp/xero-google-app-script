@@ -19,7 +19,7 @@ function onOpen() {
 function xeroReset() {
   xeroInvoiceReset();
   xeroTransactionsReset();
-  sleep(15000);
+  Utilities.sleep(15000);
   updateDayTotalsTable();
 }
 ///////////////////////////////////////////////////////////////////
