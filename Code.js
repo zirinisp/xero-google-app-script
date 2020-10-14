@@ -10,6 +10,6 @@ function updateInvoiceData() {
 }
 
 function updateTransactionData() {
-  clearTransctionLineItems(sheetName());
+  clearTransactionLineItems(sheetName());
   getTransactionsWithLineItems(sheetName());
 }
