@@ -72,38 +72,38 @@ namespace Accounting {
         }
 
         isUber(): Boolean {
-            if (this.account.toString() === AccountEnum.UberEats || (this.account.toString() === AccountEnum.KSeries && this.description.includes('UberEats'))) {
+            if (this.account.toString() === AccountEnum.UberEats || (this.account.toString() === AccountEnum.KSeries && this.description.indexOf('UberEats') !== -1)) {
                 return true;
             }
             return false;
         }
 
         isDeliveroo(): Boolean {
-            if (this.account.toString() === AccountEnum.Deliveroo || (this.account.toString() === AccountEnum.KSeries && this.description.includes('Deliveroo'))) {
+            if (this.account.toString() === AccountEnum.Deliveroo || (this.account.toString() === AccountEnum.KSeries && this.description.indexOf('Deliveroo') !== -1)) {
                 return true;
             }
             return false;
         }
         isCash(): Boolean {
-            if (this.account.toString() === AccountEnum.Cash || (this.account.toString() === AccountEnum.KSeries && this.description.includes('Cash'))) {
+            if (this.account.toString() === AccountEnum.Cash || (this.account.toString() === AccountEnum.KSeries && this.description.indexOf('Cash') !== -1)) {
                 return true;
             }
             return false;
         }
         isCard(): Boolean {
-            if (this.account.toString() === AccountEnum.iZettle || (this.account.toString() === AccountEnum.KSeries && this.description.includes('iZettle'))) {
+            if (this.account.toString() === AccountEnum.iZettle || (this.account.toString() === AccountEnum.KSeries && this.description.indexOf('iZettle') !== -1)) {
                 return true;
             }
             return false;
         }
         isSeamless(): Boolean {
-            if (this.account.toString() === AccountEnum.Seamless || (this.account.toString() === AccountEnum.KSeries && this.description.includes('Seamless'))) {
+            if (this.account.toString() === AccountEnum.Seamless || (this.account.toString() === AccountEnum.KSeries && this.description.indexOf('Seamless') !== -1)) {
                 return true;
             }
             return false;
         }
         isMealPal(): Boolean {
-            if (this.account.toString() === AccountEnum.MealPal || (this.account.toString() === AccountEnum.KSeries && this.description.includes('MealPal'))) {
+            if (this.account.toString() === AccountEnum.MealPal || (this.account.toString() === AccountEnum.KSeries && this.description.indexOf('MealPal') !== -1)) {
                 return true;
             }
             return false;
