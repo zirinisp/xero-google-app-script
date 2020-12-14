@@ -541,7 +541,7 @@ namespace Accounting {
         }
 
         isPosSale() : Boolean {
-            return (this.contactName === 'POS Sales' || this.contactName === 'Delivery Sales');
+            return (this.contactName === 'iKentoo' || this.contactName === 'POS Sales' || this.contactName === 'Delivery Sales');
         }
 
         isFoodCost() : Boolean {
