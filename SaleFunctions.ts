@@ -38,13 +38,16 @@ namespace Accounting {
         iZettle = 'IZET',
         FoodCost = '310',
         Contructors = '481',
-        Other = ''
+        Other = '',
+        KSeries = 'K-CLR'
     }
 
     class Account {
         account: string;
-        constructor(account: string) {
+        description: string;
+        constructor(account: string, description: string) {
             this.account = account;
+            this.description = description;
         }
 
         isSales(): Boolean {
@@ -69,38 +72,38 @@ namespace Accounting {
         }
 
         isUber(): Boolean {
-            if (this.account.toString() === AccountEnum.UberEats) {
+            if (this.account.toString() === AccountEnum.UberEats || (this.account.toString() === AccountEnum.KSeries && this.description.includes('UberEats'))) {
                 return true;
             }
             return false;
         }
 
         isDeliveroo(): Boolean {
-            if (this.account.toString() === AccountEnum.Deliveroo) {
+            if (this.account.toString() === AccountEnum.Deliveroo || (this.account.toString() === AccountEnum.KSeries && this.description.includes('Deliveroo'))) {
                 return true;
             }
             return false;
         }
         isCash(): Boolean {
-            if (this.account.toString() === AccountEnum.Cash) {
+            if (this.account.toString() === AccountEnum.Cash || (this.account.toString() === AccountEnum.KSeries && this.description.includes('Cash'))) {
                 return true;
             }
             return false;
         }
         isCard(): Boolean {
-            if (this.account.toString() === AccountEnum.iZettle) {
+            if (this.account.toString() === AccountEnum.iZettle || (this.account.toString() === AccountEnum.KSeries && this.description.includes('iZettle'))) {
                 return true;
             }
             return false;
         }
         isSeamless(): Boolean {
-            if (this.account.toString() === AccountEnum.Seamless) {
+            if (this.account.toString() === AccountEnum.Seamless || (this.account.toString() === AccountEnum.KSeries && this.description.includes('Seamless'))) {
                 return true;
             }
             return false;
         }
         isMealPal(): Boolean {
-            if (this.account.toString() === AccountEnum.MealPal) {
+            if (this.account.toString() === AccountEnum.MealPal || (this.account.toString() === AccountEnum.KSeries && this.description.includes('MealPal'))) {
                 return true;
             }
             return false;
@@ -560,8 +563,9 @@ namespace Accounting {
             var statusString: string = item['Status'];
             var status = new Status(statusString);
             var accountString: string = item['Account'];
+            var descriptionString: string = item['Description'];
             var contactName: string = item['Contact Name'];
-            var account = new Account(accountString);
+            var account = new Account(accountString, descriptionString);
             var date: Date = item['Date'];
             var amount: number = item['GBP Amount - No Tax'];
             var taxAmount: number = item['Tax Amount'];  // TODO: Should be changed to GBP Tax amount when ready
