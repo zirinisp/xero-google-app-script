@@ -12,6 +12,7 @@ function onOpen() {
   .addSeparator()
   .addItem('Update Day Totals', 'updateDayTotalsTable')  
   .addSeparator()
+  .addItem('Xero Update Last Year', 'xeroUpdateLastYear')  
   .addItem('Xero Update Last 2 Years', 'xeroUpdateLast2Years')  
   .addItem('Xero Reset', 'xeroReset')  
   .addToUi();
@@ -38,6 +39,18 @@ function xeroUpdateLast2Years() {
   Utilities.sleep(15000);
   updateDayTotalsTable();
 }
+
+function xeroUpdateLastYear() {
+  clearInvoiceLineItems(sheetInvoices2021);
+  getInvoicesWithLineItems(sheetInvoices2021);
+
+  clearTransactionLineItems(sheetTransactions2021);
+  getTransactionsWithLineItems(sheetTransactions2021);
+
+  Utilities.sleep(15000);
+  updateDayTotalsTable();
+}
+
 
 ///////////////////////////////////////////////////////////////////
 function log(p){return(Logger.log(p))}

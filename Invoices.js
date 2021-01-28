@@ -5,7 +5,7 @@ var batchSize = 200; // Get these many pages and then stop
 var sheetInvoices2018 = '2018-Inv';
 var sheetInvoices2019 = '2019-Inv';
 var sheetInvoices2020 = '2020-Inv';
-var sheetInvoices2020 = '2021-Inv';
+var sheetInvoices2021 = '2021-Inv';
 
 //-------------------------------------------------------
 
