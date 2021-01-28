@@ -5,6 +5,7 @@ var batchSize = 200; // Get these many pages and then stop
 var sheetInvoices2018 = '2018-Inv';
 var sheetInvoices2019 = '2019-Inv';
 var sheetInvoices2020 = '2020-Inv';
+var sheetInvoices2020 = '2021-Inv';
 
 //-------------------------------------------------------
 
@@ -15,7 +16,10 @@ function xeroInvoiceReset() {
   getInvoicesWithLineItems(sheetInvoices2019);
   clearInvoiceLineItems(sheetInvoices2020);
   getInvoicesWithLineItems(sheetInvoices2020);
+  clearInvoiceLineItems(sheetInvoices2021);
+  getInvoicesWithLineItems(sheetInvoices2021);
 }
+
 
 function clearInvoiceLineItems(sheetName) {
   

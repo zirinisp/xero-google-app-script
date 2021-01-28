@@ -5,6 +5,7 @@ var batchSize = 200; // Get these many pages and then stop
 var sheetTransactions2018 = '2018-Trans';
 var sheetTransactions2019 = '2019-Trans';
 var sheetTransactions2020 = '2020-Trans';
+var sheetTransactions2021 = '2021-Trans';
 
 //-------------------------------------------------------
 
@@ -16,6 +17,8 @@ function xeroTransactionsReset() {
   getTransactionsWithLineItems(sheetTransactions2019);
   clearTransactionLineItems(sheetTransactions2020);
   getTransactionsWithLineItems(sheetTransactions2020);
+  clearTransactionLineItems(sheetTransactions2021);
+  getTransactionsWithLineItems(sheetTransactions2021);
 }
 
 function clearTransactionLineItems(sheetName) {
