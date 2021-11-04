@@ -13,3 +13,10 @@ function updateTransactionData() {
   clearTransactionLineItems(sheetName());
   getTransactionsWithLineItems(sheetName());
 }
+
+
+function getSalePeriod(saleDate, periods) {
+  for (period in periods) {
+    
+  }
+}

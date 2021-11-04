@@ -133,6 +133,27 @@ function getXeroTransactions(complexQuery){
   return json.BankTransactions;
 }
 
+/**
+ * Gets the invoices according to a where clause
+ * @param {number} page An integer
+ * @param {string} filter A valid where clause for more information visit https://developer.xero.com/documentation/api/requests-and-responses#get-modified
+ */
+ function getXeroPayments(complexQuery){   
+  var url = "https://api.xero.com/api.xro/2.0/Payments";
+  
+  // see addQuery prototype for details
+  var end_point = url.addQuery(complexQuery,["Statuses"]);
+  
+  var response = UrlFetchApp.fetch(end_point, {
+    headers : getXeroHeaders()
+  })
+  var responseText = response.getContentText();
+  var json = JSON.parse(responseText);
+
+  return json.Payments;
+}
+
+
 function showAuthUrl() {
   var xeroService = getXeroService();
   if (!xeroService.hasAccess()) {
@@ -181,4 +202,10 @@ function getXeroTransactionsTest(){
 
   Logger.log(getXeroTransactions(complexQuery)); // year month date
   // Statuses=PAID
+}
+
+// Convert Date to Xero-DateTime
+function convertDateToXero(date) {
+  var xeroDate = "DateTime("+date.getFullYear()+","+(date.getMonth()+1)+","+date.getDate()+")";
+  return xeroDate;
 }

@@ -21,6 +21,11 @@ function xeroTransactionsReset() {
   getTransactionsWithLineItems(sheetTransactions2021);
 }
 
+function testTransactions() {
+  clearTransactionLineItems(sheetTransactions2021);
+  getTransactionsWithLineItems(sheetTransactions2021);
+}
+
 function clearTransactionLineItems(sheetName) {
   
   // Get sheet
@@ -37,6 +42,7 @@ function clearTransactionLineItems(sheetName) {
   // Clear date
   sheet.getRange(6, 9).clearContent();
 }
+
 
 function getTransactionsWithLineItems(sheetName) {
   
@@ -174,9 +180,9 @@ function getTransactionLineItems_(sheetName, invoices, filter) {
   
   // Initialise
   var invoice, key, val;
-  var lineItems, lineItem, lineKey, lineVal, acCode, itemDate, lItemID, flag, currencyRate, taxInclusive;
+  var lineItems, lineItem, lineKey, lineVal, acCode, item, lItemID, flag, currencyRate, taxInclusive;
   
-  var keys = ['BankTransactionID', 'Reference', 'BankAccount.Name', 'DateString', 'Type', 'Contact.Name', 'Status', 'Total', 'LineAmountTypes', 'CurrencyCode', 'CurrencyRate'];
+  var keys = ['BankTransactionID', 'Reference', 'BankAccount.Name', 'DateString', 'Type', 'Contact.Name', 'Status', 'Total', 'LineAmountTypes', 'CurrencyCode', 'CurrencyRate']; // We also added reference which has to go at the end. It is added on the code below.
   var lineKeys = ['LineItemID', 'AccountCode', 'Description', 'Quantity', 'LineAmount', 'TaxAmount'];
   var output = [];
   
@@ -185,6 +191,8 @@ function getTransactionLineItems_(sheetName, invoices, filter) {
     invoice = invoices[i];
     lineItems = invoice.LineItems;
     
+    var invoiceReference = invoice.Reference;
+
     if (lineItems.length > 0) {
       
       var invoiceData = [];
@@ -264,13 +272,18 @@ function getTransactionLineItems_(sheetName, invoices, filter) {
               gbpAmountWithTax = gbpAmountWithTax / currencyRate;
             }
             // This is only for transactions not invoices
-            if (invoice.Type.indexOf("RECEIVE") !== -1) {
-              gbpAmountNoTax = -gbpAmountNoTax;
-              gbpAmountWithTax = -gbpAmountWithTax;
+            if (invoice.Type.indexOf("TRANSFER") == -1) {
+              if (invoice.Type.indexOf("RECEIVE") !== -1) {
+               gbpAmountNoTax = -gbpAmountNoTax;
+                gbpAmountWithTax = -gbpAmountWithTax;
+              }
             }
             lineData.push(gbpAmountNoTax);
             lineData.push(gbpTax);
             lineData.push(gbpAmountWithTax);
+
+            lineData.push(invoiceReference);
+
             lineData = invoiceData.concat(lineData);
             
             if (flag) {
@@ -288,10 +301,4 @@ function getTransactionLineItems_(sheetName, invoices, filter) {
     }
   }
   return output;
-}
-
-// Convert Date to Xero-DateTime
-function convertDateToXero(date) {
-  var xeroDate = "DateTime("+date.getYear()+","+(date.getMonth()+1)+","+date.getDate()+")";
-  return xeroDate;
 }

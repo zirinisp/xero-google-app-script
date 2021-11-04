@@ -20,6 +20,11 @@ function xeroInvoiceReset() {
   getInvoicesWithLineItems(sheetInvoices2021);
 }
 
+function testInvoice() {
+  clearInvoiceLineItems(sheetInvoices2021);
+  getInvoicesWithLineItems(sheetInvoices2021);
+}
+
 
 function clearInvoiceLineItems(sheetName) {
   
@@ -248,6 +253,8 @@ function getLineItems_(sheetName, invoices, filter) {
     invoice = invoices[i];
     lineItems = invoice.LineItems;
     
+    var invoiceReference = invoice.Reference;
+
     if (lineItems.length > 0) {
       
       var invoiceData = [];
@@ -330,6 +337,8 @@ function getLineItems_(sheetName, invoices, filter) {
             lineData.push(gbpTax);
             lineData.push(gbpAmountWithTax);
 
+            lineData.push(invoiceReference);
+
             lineData = invoiceData.concat(lineData);
             
             if (flag) {
@@ -347,10 +356,4 @@ function getLineItems_(sheetName, invoices, filter) {
     }
   }
   return output;
-}
-
-// Convert Date to Xero-DateTime
-function convertDateToXero(date) {
-  var xeroDate = "DateTime("+date.getYear()+","+(date.getMonth()+1)+","+date.getDate()+")";
-  return xeroDate;
 }

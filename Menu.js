@@ -10,6 +10,8 @@ function onOpen() {
   .addItem('Xero Transacrion Reset Current', 'updateTransactionData')  
   .addItem('Xero Transaction Reset', 'xeroTransactionsReset')  
   .addSeparator()
+  .addItem('Xero Payments Reset', 'xeroPaymentsReset')  
+  .addSeparator()
   .addItem('Update Day Totals', 'updateDayTotalsTable')  
   .addSeparator()
   .addItem('Xero Update Last Year', 'xeroUpdateLastYear')  
@@ -21,6 +23,7 @@ function onOpen() {
 function xeroReset() {
   xeroInvoiceReset();
   xeroTransactionsReset();
+  xeroPaymentsReset();
   Utilities.sleep(15000);
   updateDayTotalsTable();
 }
@@ -36,6 +39,8 @@ function xeroUpdateLast2Years() {
   clearTransactionLineItems(sheetTransactions2021);
   getTransactionsWithLineItems(sheetTransactions2021);
 
+  xeroPaymentsReset();
+
   Utilities.sleep(15000);
   updateDayTotalsTable();
 }
@@ -46,6 +51,8 @@ function xeroUpdateLastYear() {
 
   clearTransactionLineItems(sheetTransactions2021);
   getTransactionsWithLineItems(sheetTransactions2021);
+
+  xeroPaymentsReset();
 
   Utilities.sleep(15000);
   updateDayTotalsTable();
