@@ -4,6 +4,8 @@ var batchSize = 200; // Get these many pages and then stop
 
 var sheetUberPayments = 'Uber-Payments';
 var sheetDeliverooPayments = 'Deliveroo-Payments';
+var sheetZettlePayments = 'Zettle-Payments';
+var sheetApiPayments = 'Api-Payments';
 
 //-------------------------------------------------------
 
@@ -23,10 +25,16 @@ function testDate() {
 
 
 function xeroPaymentsReset() {
-  clearPaymentsLineItems(sheetUberPayments);
-  getPaymentsWithLineItems(sheetUberPayments);
-  clearPaymentsLineItems(sheetDeliverooPayments);
-  getPaymentsWithLineItems(sheetDeliverooPayments);
+  var payments = [
+    sheetUberPayments,
+    sheetDeliverooPayments,
+    sheetZettlePayments,
+    sheetApiPayments
+  ]
+  payments.forEach(element => {
+    clearPaymentsLineItems(element);
+    getPaymentsWithLineItems(element);      
+  });
 }
 
 function testPayments() {

@@ -6,7 +6,7 @@ var sheetInvoices2018 = '2018-Inv';
 var sheetInvoices2019 = '2019-Inv';
 var sheetInvoices2020 = '2020-Inv';
 var sheetInvoices2021 = '2021-Inv';
-var sheetInvoices2021 = '2022-Inv';
+var sheetInvoices2022 = '2022-Inv';
 
 //-------------------------------------------------------
 

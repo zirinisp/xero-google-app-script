@@ -6,7 +6,7 @@ var sheetTransactions2018 = '2018-Trans';
 var sheetTransactions2019 = '2019-Trans';
 var sheetTransactions2020 = '2020-Trans';
 var sheetTransactions2021 = '2021-Trans';
-var sheetTransactions2021 = '2022-Trans';
+var sheetTransactions2022 = '2022-Trans';
 
 //-------------------------------------------------------
 
