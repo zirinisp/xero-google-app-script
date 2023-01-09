@@ -6,6 +6,9 @@ var sheetUberPayments = 'Uber-Payments';
 var sheetDeliverooPayments = 'Deliveroo-Payments';
 var sheetZettlePayments = 'Zettle-Payments';
 var sheetApiPayments = 'Api-Payments';
+var sheetFeedrPayments = 'Feedr-Payments';
+var sheetJEBPayments = 'JustEat Business-Payments';
+var sheetJEPayments = 'JustEat-Payments';
 
 //-------------------------------------------------------
 
@@ -29,7 +32,10 @@ function xeroPaymentsReset() {
     sheetUberPayments,
     sheetDeliverooPayments,
     sheetZettlePayments,
-    sheetApiPayments
+    sheetApiPayments,
+    sheetFeedrPayments,
+    sheetJEBPayments,
+    sheetJEPayments
   ]
   payments.forEach(element => {
     clearPaymentsLineItems(element);
@@ -43,9 +49,11 @@ function testPayments() {
 }
 
 function clearPaymentsLineItems(sheetName) {
-  
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  ss.toast("Clearing "+sheetName);
+
   // Get sheet
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+  var sheet = ss.getSheetByName(sheetName);
 
   // Clear sheet
   if (sheet.getLastRow() > 9) {
@@ -61,9 +69,11 @@ function clearPaymentsLineItems(sheetName) {
 
 
 function getPaymentsWithLineItems(sheetName) {
-  
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  ss.toast("Getting "+sheetName);
+
   // Get sheet
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+  var sheet = ss.getSheetByName(sheetName);
   
   // Get query
   var complexQuery = {};

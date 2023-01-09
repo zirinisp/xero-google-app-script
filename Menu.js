@@ -29,15 +29,15 @@ function xeroReset() {
 }
 
 function xeroUpdateLast2Years() {
-  clearInvoiceLineItems(sheetInvoices2021);
-  getInvoicesWithLineItems(sheetInvoices2021);
   clearInvoiceLineItems(sheetInvoices2022);
   getInvoicesWithLineItems(sheetInvoices2022);
+  clearInvoiceLineItems(sheetInvoices2023);
+  getInvoicesWithLineItems(sheetInvoices2023);
 
-  clearTransactionLineItems(sheetTransactions2021);
-  getTransactionsWithLineItems(sheetTransactions2021);
   clearTransactionLineItems(sheetTransactions2022);
   getTransactionsWithLineItems(sheetTransactions2022);
+  clearTransactionLineItems(sheetTransactions2023);
+  getTransactionsWithLineItems(sheetTransactions2023);
 
   xeroPaymentsReset();
 
@@ -46,11 +46,11 @@ function xeroUpdateLast2Years() {
 }
 
 function xeroUpdateLastYear() {
-  clearInvoiceLineItems(sheetInvoices2022);
-  getInvoicesWithLineItems(sheetInvoices2022);
+  clearInvoiceLineItems(sheetInvoices2023);
+  getInvoicesWithLineItems(sheetInvoices2023);
 
-  clearTransactionLineItems(sheetTransactions2022);
-  getTransactionsWithLineItems(sheetTransactions2022);
+  clearTransactionLineItems(sheetTransactions2023);
+  getTransactionsWithLineItems(sheetTransactions2023);
 
   xeroPaymentsReset();
 

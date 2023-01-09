@@ -7,6 +7,7 @@ var sheetTransactions2019 = '2019-Trans';
 var sheetTransactions2020 = '2020-Trans';
 var sheetTransactions2021 = '2021-Trans';
 var sheetTransactions2022 = '2022-Trans';
+var sheetTransactions2023 = '2023-Trans';
 
 //-------------------------------------------------------
 
@@ -22,6 +23,8 @@ function xeroTransactionsReset() {
   getTransactionsWithLineItems(sheetTransactions2021);
   clearTransactionLineItems(sheetTransactions2022);
   getTransactionsWithLineItems(sheetTransactions2022);
+  clearTransactionLineItems(sheetTransactions2023);
+  getTransactionsWithLineItems(sheetTransactions2023);
 }
 
 function testTransactions() {
@@ -30,9 +33,11 @@ function testTransactions() {
 }
 
 function clearTransactionLineItems(sheetName) {
-  
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  ss.toast("Clearing "+sheetName);
+
   // Get sheet
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+  var sheet = ss.getSheetByName(sheetName);
 
   // Clear sheet
   if (sheet.getLastRow() > 9) {
@@ -48,9 +53,11 @@ function clearTransactionLineItems(sheetName) {
 
 
 function getTransactionsWithLineItems(sheetName) {
-  
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  ss.toast("Getting "+sheetName);
+
   // Get sheet
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+  var sheet = ss.getSheetByName(sheetName);
   
   // Get query
   var complexQuery = {};

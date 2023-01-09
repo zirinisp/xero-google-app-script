@@ -7,6 +7,8 @@ var sheetInvoices2019 = '2019-Inv';
 var sheetInvoices2020 = '2020-Inv';
 var sheetInvoices2021 = '2021-Inv';
 var sheetInvoices2022 = '2022-Inv';
+var sheetInvoices2023 = '2023-Inv';
+
 
 //-------------------------------------------------------
 
@@ -21,6 +23,8 @@ function xeroInvoiceReset() {
   getInvoicesWithLineItems(sheetInvoices2021);
   clearInvoiceLineItems(sheetInvoices2022);
   getInvoicesWithLineItems(sheetInvoices2022);
+  clearInvoiceLineItems(sheetInvoices2023);
+  getInvoicesWithLineItems(sheetInvoices2023);
 }
 
 function testInvoice() {
@@ -30,9 +34,11 @@ function testInvoice() {
 
 
 function clearInvoiceLineItems(sheetName) {
-  
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  ss.toast("Clearing "+sheetName);
+
   // Get sheet
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+  var sheet = ss.getSheetByName(sheetName);
 
   // Clear sheet
   if (sheet.getLastRow() > 9) {
@@ -48,9 +54,11 @@ function clearInvoiceLineItems(sheetName) {
 
 
 function getInvoicesWithLineItems(sheetName) {
-  
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  ss.toast("Getting "+sheetName);
+
   // Get sheet
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+  var sheet = ss.getSheetByName(sheetName);
   
   // Get query
   var complexQuery = {};
