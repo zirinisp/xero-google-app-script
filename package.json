@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/zirinisp/xero-google-app-script/issues"
   },
-  "homepage": "https://github.com/zirinisp/xero-google-app-script#readme"
+  "homepage": "https://github.com/zirinisp/xero-google-app-script#readme",
+  "dependencies": {
+    "@types/google-apps-script": "^1.0.56"
+  }
 }

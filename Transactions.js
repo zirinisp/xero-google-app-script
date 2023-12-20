@@ -8,15 +8,16 @@ var sheetTransactions2020 = '2020-Trans';
 var sheetTransactions2021 = '2021-Trans';
 var sheetTransactions2022 = '2022-Trans';
 var sheetTransactions2023 = '2023-Trans';
+var sheetTransactions2024 = '2024-Trans';
 
 //-------------------------------------------------------
 
 
 function xeroTransactionsReset() {
-  clearTransactionLineItems(sheetTransactions2018);
-  getTransactionsWithLineItems(sheetTransactions2018);
-  clearTransactionLineItems(sheetTransactions2019);
-  getTransactionsWithLineItems(sheetTransactions2019);
+  //clearTransactionLineItems(sheetTransactions2018);
+  //getTransactionsWithLineItems(sheetTransactions2018);
+  //clearTransactionLineItems(sheetTransactions2019);
+  //getTransactionsWithLineItems(sheetTransactions2019);
   clearTransactionLineItems(sheetTransactions2020);
   getTransactionsWithLineItems(sheetTransactions2020);
   clearTransactionLineItems(sheetTransactions2021);
@@ -25,6 +26,8 @@ function xeroTransactionsReset() {
   getTransactionsWithLineItems(sheetTransactions2022);
   clearTransactionLineItems(sheetTransactions2023);
   getTransactionsWithLineItems(sheetTransactions2023);
+  clearTransactionLineItems(sheetTransactions2024);
+  getTransactionsWithLineItems(sheetTransactions2024);
 }
 
 function testTransactions() {
