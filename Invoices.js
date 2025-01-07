@@ -9,6 +9,7 @@ var sheetInvoices2021 = '2021-Inv';
 var sheetInvoices2022 = '2022-Inv';
 var sheetInvoices2023 = '2023-Inv';
 var sheetInvoices2024 = '2024-Inv';
+var sheetInvoices2025 = '2025-Inv';
 
 
 //-------------------------------------------------------
@@ -18,8 +19,8 @@ function xeroInvoiceReset() {
   //getInvoicesWithLineItems(sheetInvoices2018);
   //clearInvoiceLineItems(sheetInvoices2019);
   //getInvoicesWithLineItems(sheetInvoices2019);
-  clearInvoiceLineItems(sheetInvoices2020);
-  getInvoicesWithLineItems(sheetInvoices2020);
+  //clearInvoiceLineItems(sheetInvoices2020);
+  //getInvoicesWithLineItems(sheetInvoices2020);
   clearInvoiceLineItems(sheetInvoices2021);
   getInvoicesWithLineItems(sheetInvoices2021);
   clearInvoiceLineItems(sheetInvoices2022);
@@ -28,6 +29,8 @@ function xeroInvoiceReset() {
   getInvoicesWithLineItems(sheetInvoices2023);
   clearInvoiceLineItems(sheetInvoices2024);
   getInvoicesWithLineItems(sheetInvoices2024);
+  clearInvoiceLineItems(sheetInvoices2025);
+  getInvoicesWithLineItems(sheetInvoices2025);
 }
 
 function testInvoice() {
